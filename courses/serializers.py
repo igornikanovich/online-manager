@@ -18,6 +18,25 @@ class CourseReadSerializer(CourseSerializer):
         depth = 1
 
 
+class LectureSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Lecture
+        fields = ('course', 'theme', 'file',)
+
+    def create(self, validated_data):
+        request = self.context['request']
+        author = request.user.teacher
+        return Lecture.objects.create(author=author, **validated_data)
+
+
+class LectureReadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Lecture
+        fields = ('id', 'author', 'course', 'theme', 'file',)
+        depth = 1
+
+
 class TaskSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -56,20 +75,39 @@ class HomeworkReadSerializer(serializers.ModelSerializer):
         depth = 1
 
 
-class LectureSerializer(serializers.ModelSerializer):
+class MarkSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Lecture
-        fields = ('course', 'theme', 'file',)
+        model = Mark
+        fields = ('homework', 'mark',)
 
     def create(self, validated_data):
         request = self.context['request']
         author = request.user.teacher
-        return Lecture.objects.create(author=author, **validated_data)
+        return Task.objects.create(author=author, **validated_data)
 
 
-class LectureReadSerializer(serializers.ModelSerializer):
+class MarkReadSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Lecture
-        fields = ('id', 'author', 'course', 'theme', 'file',)
+        model = Mark
+        fields = ('id', 'author', 'homework', 'mark',)
+        depth = 1
+
+
+class CommentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Comment
+        fields = ('mark', 'comment',)
+
+    def create(self, validated_data):
+        request = self.context['request']
+        author = request.user
+        return Task.objects.create(author=author, **validated_data)
+
+
+class CommentReadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ('id', 'author', 'mark', 'comment',)
         depth = 1

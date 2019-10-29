@@ -56,6 +56,9 @@ class LectureViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         return LectureReadSerializer if self.request.method == 'GET' else LectureSerializer
 
+    def get_queryset(self):
+        return Lecture.objects.filter(course_id=self.kwargs['course_id'])
+
 
 class TaskViewSet(viewsets.ModelViewSet):
     """
