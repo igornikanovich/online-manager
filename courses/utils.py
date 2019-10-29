@@ -3,4 +3,4 @@ def content_file_name(instance, filename):
 
 
 def content_file_answer(instance, filename):
-    return '/'.join(['answer', instance.homework.lecture.theme, filename])
+    return '/'.join(['homework', instance.task.name, filename])

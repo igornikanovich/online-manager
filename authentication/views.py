@@ -31,16 +31,14 @@ class UserLoginAPIView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         login(request, user)
-        token, created = Token.objects.get_or_create(user=user)
         headers = self.get_success_headers(serializer.data)
-        return Response({"token": token.key}, status=status.HTTP_200_OK, headers=headers)
+        return Response(status=status.HTTP_200_OK, headers=headers)
 
 
 class UserLogoutAPIView(APIView):
     """
     Endpoint for user logout.
     """
-    authentication_classes = (TokenAuthentication, )
 
     def post(self, request):
         logout(request)

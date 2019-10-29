@@ -20,6 +20,13 @@ class IsTeacher(permissions.BasePermission):
     def has_permission(self, request, view):
         return Teacher.objects.filter(user=request.user).exists()
 
+#??????????????????????????????????????????????????????
+class IsTeachersCourse(permissions.BasePermission):
+    message = 'You can modify content linked only with your course.'
+
+    def has_object_permission(self, request, view, obj):
+        return obj == request.user.teacher.course
+
 
 class IsStudentAuthor(permissions.BasePermission):
     message = AUTHOR_DEFAULT_MESSAGE
@@ -33,3 +40,5 @@ class IsTeacherAuthor(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         return obj.author == request.user.teacher
+
+

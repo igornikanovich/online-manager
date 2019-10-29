@@ -34,7 +34,7 @@ class LectureReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lecture
         fields = ('id', 'author', 'course', 'theme', 'file',)
-        depth = 1
+        # depth = 1
 
 
 class TaskSerializer(serializers.ModelSerializer):
@@ -53,14 +53,14 @@ class TaskReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = ('id', 'author', 'lecture', 'name', 'task',)
-        depth = 1
+        # depth = 1
 
 
 class HomeworkSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Homework
-        fields = ('homework', 'file',)
+        fields = ('task', 'file',)
 
     def create(self, validated_data):
         request = self.context['request']
@@ -71,8 +71,8 @@ class HomeworkSerializer(serializers.ModelSerializer):
 class HomeworkReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Homework
-        fields = ('id', 'author', 'homework', 'file',)
-        depth = 1
+        fields = ('id', 'author', 'task', 'file',)
+        # depth = 1
 
 
 class MarkSerializer(serializers.ModelSerializer):
@@ -91,7 +91,7 @@ class MarkReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Mark
         fields = ('id', 'author', 'homework', 'mark',)
-        depth = 1
+        # depth = 1
 
 
 class CommentSerializer(serializers.ModelSerializer):
