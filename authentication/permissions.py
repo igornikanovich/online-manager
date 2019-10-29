@@ -42,3 +42,10 @@ class IsTeacherAuthor(permissions.BasePermission):
         return obj.author == request.user.teacher
 
 
+class IsUserAuthor(permissions.BasePermission):
+    message = AUTHOR_DEFAULT_MESSAGE
+
+    def has_object_permission(self, request, view, obj):
+        return obj.author == request.user
+
+

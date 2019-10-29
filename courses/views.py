@@ -3,11 +3,11 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from authentication.permissions import IsTeacher, IsTeacherAuthor, IsTeachersCourse, IsStudent
-from .models import Course, Homework, Lecture, Task, Mark
+from authentication.permissions import IsTeacher, IsTeacherAuthor, IsTeachersCourse, IsStudent, IsUserAuthor
+from .models import Course, Homework, Lecture, Task, Mark, Comment
 from .serializers import CourseSerializer, CourseReadSerializer, TaskSerializer, TaskReadSerializer, \
     LectureSerializer, LectureReadSerializer, HomeworkReadSerializer, HomeworkSerializer, MarkReadSerializer, \
-    MarkSerializer
+    MarkSerializer, CommentReadSerializer, CommentSerializer
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -143,5 +143,36 @@ class MarkViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return Mark.objects.filter(homework__task__lecture__course_id=self.kwargs['course_id'],
                                    homework__task__lecture_id=self.kwargs['lecture_id'],
-                                   homework__task_id=self.kwargs['task_id'])
-                                   # homework_id=self.kwargs['homework_id'])
+                                   homework__task_id=self.kwargs['task_id'],
+                                   homework_id=self.kwargs['homework_id'])
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    """
+    Endpoint for list, create, update and delete a comment.
+    """
+    queryset = Comment.objects.all()
+    permission_classes_by_action = {
+        'list': [IsAuthenticated, ],
+        'retrieve': [IsAuthenticated, ],
+        'create': [IsAuthenticated, ],
+        'update': [IsAuthenticated, IsUserAuthor, ],
+        'partial_update': [IsAuthenticated, IsUserAuthor, ],
+        'destroy': [IsAuthenticated, IsUserAuthor, ],
+    }
+
+    def get_permissions(self):
+        try:
+            return [permission() for permission in self.permission_classes_by_action[self.action]]
+        except KeyError:
+            return [permission() for permission in self.permission_classes]
+
+    def get_serializer_class(self):
+        return CommentReadSerializer if self.request.method == 'GET' else CommentSerializer
+
+    def get_queryset(self):
+        return Comment.objects.filter(mark__homework__task__lecture__course_id=self.kwargs['course_id'],
+                                   mark__homework__task__lecture_id=self.kwargs['lecture_id'],
+                                   mark__homework__task_id=self.kwargs['task_id'],
+                                   mark__homework_id=self.kwargs['homework_id'],
+                                   mark_id=self.kwargs['mark_id'])

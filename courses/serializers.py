@@ -84,7 +84,7 @@ class MarkSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         request = self.context['request']
         author = request.user.teacher
-        return Task.objects.create(author=author, **validated_data)
+        return Mark.objects.create(author=author, **validated_data)
 
 
 class MarkReadSerializer(serializers.ModelSerializer):
@@ -103,11 +103,11 @@ class CommentSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         request = self.context['request']
         author = request.user
-        return Task.objects.create(author=author, **validated_data)
+        return Comment.objects.create(author=author, **validated_data)
 
 
 class CommentReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ('id', 'author', 'mark', 'comment',)
-        depth = 1
+        # depth = 1
