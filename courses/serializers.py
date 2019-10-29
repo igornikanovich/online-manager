@@ -36,7 +36,7 @@ class LectureReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lecture
         fields = ('id', 'author', 'course', 'theme', 'file',)
-        # depth = 1
+        # depth = 2
 
 
 class TaskSerializer(serializers.ModelSerializer):

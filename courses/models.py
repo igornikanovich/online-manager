@@ -49,7 +49,7 @@ class Mark(models.Model):
     author = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     homework = models.OneToOneField(Homework, on_delete=models.CASCADE)
     mark = models.PositiveSmallIntegerField(validators=[MinValueValidator(0),
-                                                        MaxValueValidator(10)]) # ????????????????????????
+                                                        MaxValueValidator(10)])
 
     def __str__(self):
         return str(self.mark)

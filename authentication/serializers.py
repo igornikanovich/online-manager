@@ -1,7 +1,5 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from django.contrib.auth.password_validation import validate_password
-from django.core.validators import validate_email, ValidationError
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
@@ -73,16 +71,3 @@ class UserLoginSerializer(serializers.Serializer):
             raise serializers.ValidationError('Unable to log in with provided credentials.')
         data['user'] = user
         return data
-
-
-class StudentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Student
-        fields = ('id', 'user_id')
-
-
-class TeacherSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Teacher
-        fields = ('id', 'user_id')
-

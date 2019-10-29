@@ -1,8 +1,7 @@
-from rest_framework import generics, filters, status, viewsets
+from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 
-from authentication.permissions import IsTeacher, IsTeacherAuthor, IsTeachersCourse, IsStudent, IsUserAuthor
+from authentication.permissions import IsTeacher, IsTeacherAuthor, IsStudent, IsUserAuthor, IsStudentAuthor
 from .models import Course, Homework, Lecture, Task, Mark, Comment
 from .serializers import CourseSerializer, CourseReadSerializer, TaskSerializer, TaskReadSerializer, \
     LectureSerializer, LectureReadSerializer, HomeworkReadSerializer, HomeworkSerializer, MarkReadSerializer, \
@@ -17,10 +16,10 @@ class CourseViewSet(viewsets.ModelViewSet):
     permission_classes_by_action = {
         'list': [IsAuthenticated, ],
         'retrieve': [IsAuthenticated, ],
-        'create': [IsAuthenticated, IsTeacher, ],
-        'update': [IsAuthenticated, IsTeacher, IsTeacherAuthor, ],
-        'partial_update': [IsAuthenticated, IsTeacher, IsTeacherAuthor, ],
-        'destroy': [IsAuthenticated, IsTeacher, IsTeacherAuthor, ],
+        'create': [IsAuthenticated, IsTeacher],
+        'update': [IsAuthenticated, IsTeacher, IsTeacherAuthor],
+        'partial_update': [IsAuthenticated, IsTeacher, IsTeacherAuthor],
+        'destroy': [IsAuthenticated, IsTeacher, IsTeacherAuthor],
     }
 
     def get_permissions(self):
@@ -41,10 +40,10 @@ class LectureViewSet(viewsets.ModelViewSet):
     permission_classes_by_action = {
         'list': [IsAuthenticated, ],
         'retrieve': [IsAuthenticated, ],
-        'create': [IsAuthenticated, IsTeacher, ],
-        'update': [IsAuthenticated, IsTeacher, IsTeacherAuthor, ],
-        'partial_update': [IsAuthenticated, IsTeacher, IsTeacherAuthor, ],
-        'destroy': [IsAuthenticated, IsTeacher, IsTeacherAuthor, ],
+        'create': [IsAuthenticated, IsTeacher],
+        'update': [IsAuthenticated, IsTeacher, IsTeacherAuthor],
+        'partial_update': [IsAuthenticated, IsTeacher, IsTeacherAuthor],
+        'destroy': [IsAuthenticated, IsTeacher, IsTeacherAuthor],
     }
 
     def get_permissions(self):
@@ -68,10 +67,10 @@ class TaskViewSet(viewsets.ModelViewSet):
     permission_classes_by_action = {
         'list': [IsAuthenticated, ],
         'retrieve': [IsAuthenticated, ],
-        'create': [IsAuthenticated, IsTeacher, ],
-        'update': [IsAuthenticated, IsTeacher, ],
-        'partial_update': [IsAuthenticated, IsTeacher, ],
-        'destroy': [IsAuthenticated, IsTeacher, ],
+        'create': [IsAuthenticated, IsTeacher],
+        'update': [IsAuthenticated, IsTeacher],
+        'partial_update': [IsAuthenticated, IsTeacher],
+        'destroy': [IsAuthenticated, IsTeacher],
     }
 
     def get_permissions(self):
@@ -96,10 +95,10 @@ class HomeworkViewSet(viewsets.ModelViewSet):
     permission_classes_by_action = {
         'list': [IsAuthenticated, ],
         'retrieve': [IsAuthenticated, ],
-        'create': [IsAuthenticated, IsStudent, ],
-        'update': [IsAuthenticated, IsStudent, ],
-        'partial_update': [IsAuthenticated, IsStudent, ],
-        'destroy': [IsAuthenticated, IsTeacher, ],
+        'create': [IsAuthenticated, IsStudent],
+        'update': [IsAuthenticated, IsStudent, IsStudentAuthor],
+        'partial_update': [IsAuthenticated, IsStudent, IsStudentAuthor],
+        'destroy': [IsAuthenticated, IsTeacher],
     }
 
     def get_permissions(self):
@@ -125,10 +124,10 @@ class MarkViewSet(viewsets.ModelViewSet):
     permission_classes_by_action = {
         'list': [IsAuthenticated, ],
         'retrieve': [IsAuthenticated, ],
-        'create': [IsAuthenticated, IsTeacher, ],
-        'update': [IsAuthenticated, IsTeacher, ],
-        'partial_update': [IsAuthenticated, IsTeacher, ],
-        'destroy': [IsAuthenticated, IsTeacher, ],
+        'create': [IsAuthenticated, IsTeacher],
+        'update': [IsAuthenticated, IsTeacher],
+        'partial_update': [IsAuthenticated, IsTeacher],
+        'destroy': [IsAuthenticated, IsTeacher],
     }
 
     def get_permissions(self):
@@ -157,8 +156,8 @@ class CommentViewSet(viewsets.ModelViewSet):
         'retrieve': [IsAuthenticated, ],
         'create': [IsAuthenticated, ],
         'update': [IsAuthenticated, IsUserAuthor, ],
-        'partial_update': [IsAuthenticated, IsUserAuthor, ],
-        'destroy': [IsAuthenticated, IsUserAuthor, ],
+        'partial_update': [IsAuthenticated, IsUserAuthor],
+        'destroy': [IsAuthenticated, IsUserAuthor],
     }
 
     def get_permissions(self):
@@ -172,7 +171,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Comment.objects.filter(mark__homework__task__lecture__course_id=self.kwargs['course_id'],
-                                   mark__homework__task__lecture_id=self.kwargs['lecture_id'],
-                                   mark__homework__task_id=self.kwargs['task_id'],
-                                   mark__homework_id=self.kwargs['homework_id'],
-                                   mark_id=self.kwargs['mark_id'])
+                                      mark__homework__task__lecture_id=self.kwargs['lecture_id'],
+                                      mark__homework__task_id=self.kwargs['task_id'],
+                                      mark__homework_id=self.kwargs['homework_id'],
+                                      mark_id=self.kwargs['mark_id'])

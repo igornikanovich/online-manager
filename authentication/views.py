@@ -1,13 +1,10 @@
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
-from rest_framework import generics, viewsets, permissions, status, authentication
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.authtoken.models import Token
+from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Teacher, Student
-from .serializers import UserRegisterSerializer, StudentSerializer, TeacherSerializer, UserLoginSerializer
+from .serializers import UserRegisterSerializer, UserLoginSerializer
 
 
 class UserRegistrationAPIView(generics.CreateAPIView):
@@ -39,17 +36,6 @@ class UserLogoutAPIView(APIView):
     """
     Endpoint for user logout.
     """
-
     def post(self, request):
         logout(request)
         return Response(status=status.HTTP_200_OK)
-
-
-class TeacherViewSet(viewsets.ModelViewSet):
-    queryset = Teacher.objects.all()
-    serializer_class = TeacherSerializer
-
-
-class StudentViewSet(viewsets.ModelViewSet):
-    queryset = Student.objects.all()
-    serializer_class = StudentSerializer
