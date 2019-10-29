@@ -1,5 +1,4 @@
 from rest_framework import generics, filters, status, viewsets
-from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -42,7 +41,7 @@ class LectureViewSet(viewsets.ModelViewSet):
     permission_classes_by_action = {
         'list': [IsAuthenticated, ],
         'retrieve': [IsAuthenticated, ],
-        'create': [IsAuthenticated, IsTeacher, IsTeachersCourse, ],
+        'create': [IsAuthenticated, IsTeacher, ],
         'update': [IsAuthenticated, IsTeacher, IsTeacherAuthor, ],
         'partial_update': [IsAuthenticated, IsTeacher, IsTeacherAuthor, ],
         'destroy': [IsAuthenticated, IsTeacher, IsTeacherAuthor, ],
@@ -63,7 +62,7 @@ class LectureViewSet(viewsets.ModelViewSet):
 
 class TaskViewSet(viewsets.ModelViewSet):
     """
-    Endpoint for list, create, update and delete a homework.
+    Endpoint for list, create, update and delete a task.
     """
     queryset = Task.objects.all()
     permission_classes_by_action = {
@@ -88,6 +87,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         return Task.objects.filter(lecture__course_id=self.kwargs['course_id'],
                                    lecture_id=self.kwargs['lecture_id'])
 
+
 class HomeworkViewSet(viewsets.ModelViewSet):
     """
     Endpoint for list, create, update and delete a homework.
@@ -99,7 +99,7 @@ class HomeworkViewSet(viewsets.ModelViewSet):
         'create': [IsAuthenticated, IsStudent, ],
         'update': [IsAuthenticated, IsStudent, ],
         'partial_update': [IsAuthenticated, IsStudent, ],
-        'destroy': [IsAuthenticated, IsStudent, ],
+        'destroy': [IsAuthenticated, IsTeacher, ],
     }
 
     def get_permissions(self):

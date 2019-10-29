@@ -25,7 +25,7 @@ class IsTeachersCourse(permissions.BasePermission):
     message = 'You can modify content linked only with your course.'
 
     def has_object_permission(self, request, view, obj):
-        return obj == request.user.teacher.course
+        return obj == request.user.teacher
 
 
 class IsStudentAuthor(permissions.BasePermission):
