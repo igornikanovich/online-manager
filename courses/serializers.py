@@ -7,7 +7,20 @@ class CourseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Course
-        fields = '__all__'
+        fields = ('title', 'students', 'teachers')
+
+    def create(self, validated_data):
+        request = self.context['request']
+        author = request.user.teacher
+        students_data = validated_data.pop('students')
+        teachers_data = validated_data.pop('teachers')
+        course = Course.objects.create(author=author, **validated_data)
+
+        for student in students_data:
+            course.students.add(student)
+        for teacher in teachers_data:
+            course.teachers.add(teacher)
+        return course
 
 
 class CourseReadSerializer(CourseSerializer):
