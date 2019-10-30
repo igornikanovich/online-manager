@@ -1,8 +1,7 @@
-from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import permissions
 
 from courses.models import Course, Lecture, Task
-from .models import Student, Teacher
+from .models import User
 
 
 ROLE_DEFAULT_MESSAGE = 'Only {}s are allowed to view and modify this content.'
@@ -13,28 +12,28 @@ class IsStudent(permissions.BasePermission):
     message = ROLE_DEFAULT_MESSAGE.format('student')
 
     def has_permission(self, request, view):
-        return Student.objects.filter(user=request.user).exists()
+        return User.objects.filter(user_type=request.user.user_type == 2).exists()
 
 
 class IsTeacher(permissions.BasePermission):
     message = ROLE_DEFAULT_MESSAGE.format('teacher')
 
     def has_permission(self, request, view):
-        return Teacher.objects.filter(user=request.user).exists()
+        return User.objects.filter(user_type=request.user.user_type == 1).exists()
 
 
 class IsStudentAuthor(permissions.BasePermission):
     message = AUTHOR_DEFAULT_MESSAGE
 
     def has_object_permission(self, request, view, obj):
-        return obj.author == request.user.student
+        return obj.author == request.user.user_type == 2
 
 
 class IsTeacherAuthor(permissions.BasePermission):
     message = AUTHOR_DEFAULT_MESSAGE
 
     def has_object_permission(self, request, view, obj):
-        return obj.author == request.user.teacher
+        return obj.author == request.user.user_type == 1
 
 
 class IsUserAuthor(permissions.BasePermission):
@@ -42,47 +41,3 @@ class IsUserAuthor(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         return obj.author == request.user
-
-
-class IsMemberCourse(permissions.BasePermission):
-    message = ROLE_DEFAULT_MESSAGE.format('member')
-
-    def has_permission(self, request, view):
-        try:
-            if request.user.student:
-                return Course.objects.filter(students=request.user.student)
-        except ObjectDoesNotExist:
-            return Course.objects.filter(teachers=request.user.teacher)
-
-
-class IsMemberLecture(permissions.BasePermission):
-    message = ROLE_DEFAULT_MESSAGE.format('member')
-
-    def has_permission(self, request, view):
-        try:
-            if request.user.student:
-                return Lecture.objects.filter(course__students=request.user.student)
-        except ObjectDoesNotExist:
-            return Lecture.objects.filter(course__teachers=request.user.teacher)
-
-
-class IsMemberTask(permissions.BasePermission):
-    message = ROLE_DEFAULT_MESSAGE.format('member')
-
-    def has_permission(self, request, view):
-        try:
-            if request.user.student:
-                return Task.objects.filter(lecture__course__students=request.user.student)
-        except ObjectDoesNotExist:
-            return Task.objects.filter(lecture__course__teachers=request.user.teacher)
-
-
-class IsMemberHomework(permissions.BasePermission):
-    message = ROLE_DEFAULT_MESSAGE.format('member')
-
-    def has_permission(self, request, view):
-        try:
-            if request.user.student:
-                return Course.objects.filter(task__lecture__course__students=request.user.student)
-        except ObjectDoesNotExist:
-            return Course.objects.filter(task__lecture__course__teachers=request.user.teacher)

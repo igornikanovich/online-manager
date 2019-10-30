@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from .models import Student, Teacher, CustomUser
+from .models import User
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -27,7 +27,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = CustomUser
+        model = User
         fields = (
             'id',
             'username',
@@ -35,23 +35,17 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             'email',
             'first_name',
             'last_name',
-            'is_teacher',
+            'user_type',
         )
         extra_kwargs = {
             'password': {'write_only': True},
         }
 
     def create(self, validated_data):
-        is_teacher = validated_data.pop('is_teacher')
         password = validated_data.pop('password')
         user = User.objects.create(**validated_data)
         user.set_password(password)
         user.save()
-
-        if not is_teacher:
-            Student.objects.create(user_id=user.id)
-        else:
-            Teacher.objects.create(user_id=user.id)
         return user
 
 
@@ -68,6 +62,6 @@ class UserLoginSerializer(serializers.Serializer):
         password = data.get('password')
         user = authenticate(username=username, password=password)
         if not user:
-            raise serializers.ValidationError('Unable to log in with provided credentials.')
+            raise serializers.ValidationError('Wrong login or password.')
         data['user'] = user
         return data

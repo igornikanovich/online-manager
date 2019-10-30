@@ -1,8 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 
-from authentication.permissions import IsTeacher, IsTeacherAuthor, IsStudent, IsUserAuthor, IsStudentAuthor, \
-    IsMemberCourse, IsMemberLecture, IsMemberTask, IsMemberHomework
+from authentication.permissions import IsTeacher, IsTeacherAuthor, IsStudent, IsUserAuthor, IsStudentAuthor
 from .models import Course, Homework, Lecture, Task, Mark, Comment
 from .serializers import CourseSerializer, CourseReadSerializer, TaskSerializer, TaskReadSerializer, \
     LectureSerializer, LectureReadSerializer, HomeworkReadSerializer, HomeworkSerializer, MarkReadSerializer, \
@@ -15,8 +14,8 @@ class CourseViewSet(viewsets.ModelViewSet):
     """
     queryset = Course.objects.all()
     permission_classes_by_action = {
-        'list': [IsAuthenticated, IsMemberCourse],
-        'retrieve': [IsAuthenticated, IsMemberCourse],
+        'list': [IsAuthenticated, ],
+        'retrieve': [IsAuthenticated, ],
         'create': [IsAuthenticated, IsTeacher],
         'update': [IsAuthenticated, IsTeacher, IsTeacherAuthor],
         'partial_update': [IsAuthenticated, IsTeacher, IsTeacherAuthor],
@@ -39,8 +38,8 @@ class LectureViewSet(viewsets.ModelViewSet):
     """
     queryset = Lecture.objects.all()
     permission_classes_by_action = {
-        'list': [IsAuthenticated, IsMemberLecture],
-        'retrieve': [IsAuthenticated, IsMemberLecture],
+        'list': [IsAuthenticated, ],
+        'retrieve': [IsAuthenticated, ],
         'create': [IsAuthenticated, IsTeacher],
         'update': [IsAuthenticated, IsTeacher, IsTeacherAuthor],
         'partial_update': [IsAuthenticated, IsTeacher, IsTeacherAuthor],
@@ -66,8 +65,8 @@ class TaskViewSet(viewsets.ModelViewSet):
     """
     queryset = Task.objects.all()
     permission_classes_by_action = {
-        'list': [IsAuthenticated, IsMemberTask],
-        'retrieve': [IsAuthenticated, IsMemberTask],
+        'list': [IsAuthenticated, ],
+        'retrieve': [IsAuthenticated, ],
         'create': [IsAuthenticated, IsTeacher],
         'update': [IsAuthenticated, IsTeacher],
         'partial_update': [IsAuthenticated, IsTeacher],
@@ -94,8 +93,8 @@ class HomeworkViewSet(viewsets.ModelViewSet):
     """
     queryset = Homework.objects.all()
     permission_classes_by_action = {
-        'list': [IsAuthenticated, IsMemberHomework],
-        'retrieve': [IsAuthenticated, IsMemberHomework],
+        'list': [IsAuthenticated, ],
+        'retrieve': [IsAuthenticated, ],
         'create': [IsAuthenticated, IsStudent],
         'update': [IsAuthenticated, IsStudent, IsStudentAuthor],
         'partial_update': [IsAuthenticated, IsStudent, IsStudentAuthor],

@@ -1,20 +1,18 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 
 
-class CustomUser(User):
-    is_teacher = models.BooleanField(default=False)
+class User(AbstractUser):
 
+    Teacher = 1
+    Student = 2
 
-class Teacher(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    USER_TYPE_CHOICES = (
+        (1, 'Teacher'),
+        (2, 'Student')
+    )
 
-    def __str__(self):
-        return self.user.username
-
-
-class Student(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user_type = models.PositiveSmallIntegerField(choices=USER_TYPE_CHOICES, null=True)
 
     def __str__(self):
-        return self.user.username
+        return self.username

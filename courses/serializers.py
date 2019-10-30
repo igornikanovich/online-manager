@@ -11,11 +11,13 @@ class CourseSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         request = self.context['request']
-        author = request.user.teacher
+        author = request.user
         students_data = validated_data.pop('students')
         teachers_data = validated_data.pop('teachers')
         course = Course.objects.create(author=author, **validated_data)
 
+
+############################################### peredelat
         for student in students_data:
             course.students.add(student)
         for teacher in teachers_data:
@@ -39,7 +41,7 @@ class LectureSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         request = self.context['request']
-        author = request.user.teacher
+        author = request.user
         course_id = self.context.get('request').parser_context['kwargs']['course_id']
         validated_data['course'] = Course.objects.get(pk=course_id)
         return Lecture.objects.create(author=author, **validated_data)
@@ -60,7 +62,7 @@ class TaskSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         request = self.context['request']
-        author = request.user.teacher
+        author = request.user
         lecture_id = self.context.get('request').parser_context['kwargs']['lecture_id']
         validated_data['lecture'] = Lecture.objects.get(pk=lecture_id)
         return Task.objects.create(author=author, **validated_data)
@@ -81,7 +83,7 @@ class HomeworkSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         request = self.context['request']
-        author = request.user.student
+        author = request.user
         task_id = self.context.get('request').parser_context['kwargs']['task_id']
         validated_data['task'] = Task.objects.get(pk=task_id)
         return Homework.objects.create(author=author, **validated_data)
@@ -104,7 +106,7 @@ class MarkSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         request = self.context['request']
-        author = request.user.teacher
+        author = request.user
         homework_id = self.context.get('request').parser_context['kwargs']['homework_id']
         validated_data['homework'] = Homework.objects.get(pk=homework_id)
         return Mark.objects.create(author=author, **validated_data)
