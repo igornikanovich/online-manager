@@ -48,56 +48,41 @@ class IsMemberCourse(permissions.BasePermission):
     message = ROLE_DEFAULT_MESSAGE.format('member')
 
     def has_permission(self, request, view):
-        if request.user is Student:
-            try:
+        try:
+            if request.user.student:
                 return Course.objects.filter(students=request.user.student)
-            except ObjectDoesNotExist:
-                pass
-        # else:
-        #     try:
-        #         return Course.objects.filter(teachers=request.user.teacher)
-        #     except ObjectDoesNotExist:
-        #         pass
+        except ObjectDoesNotExist:
+            return Course.objects.filter(teachers=request.user.teacher)
 
 
 class IsMemberLecture(permissions.BasePermission):
     message = ROLE_DEFAULT_MESSAGE.format('member')
 
     def has_permission(self, request, view):
-        if request.user.student:
-            try:
-                return Lecture.objects.filter(course__students=request.user.student)
-            except ObjectDoesNotExist:
-                pass
         try:
-            return Lecture.objects.filter(course__teachers=request.user.teacher)
+            if request.user.student:
+                return Lecture.objects.filter(course__students=request.user.student)
         except ObjectDoesNotExist:
-            pass
+            return Lecture.objects.filter(course__teachers=request.user.teacher)
+
 
 class IsMemberTask(permissions.BasePermission):
     message = ROLE_DEFAULT_MESSAGE.format('member')
 
     def has_permission(self, request, view):
-        if request.user.student:
-            try:
-                return Task.objects.filter(lecture__course__students=request.user.student)
-            except ObjectDoesNotExist:
-                pass
         try:
-            return Task.objects.filter(lecture__course__teachers=request.user.teacher)
+            if request.user.student:
+                return Task.objects.filter(lecture__course__students=request.user.student)
         except ObjectDoesNotExist:
-            pass
+            return Task.objects.filter(lecture__course__teachers=request.user.teacher)
+
 
 class IsMemberHomework(permissions.BasePermission):
     message = ROLE_DEFAULT_MESSAGE.format('member')
 
     def has_permission(self, request, view):
-        if request.user.student:
-            try:
-                return Course.objects.filter(task__lecture__course__students=request.user.student)
-            except ObjectDoesNotExist:
-                pass
         try:
-            return Course.objects.filter(task__lecture__course__teachers=request.user.teacher)
+            if request.user.student:
+                return Course.objects.filter(task__lecture__course__students=request.user.student)
         except ObjectDoesNotExist:
-            pass
+            return Course.objects.filter(task__lecture__course__teachers=request.user.teacher)

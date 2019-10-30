@@ -15,8 +15,8 @@ class CourseViewSet(viewsets.ModelViewSet):
     """
     queryset = Course.objects.all()
     permission_classes_by_action = {
-        'list': [IsAuthenticated, ],
-        'retrieve': [IsAuthenticated, ],
+        'list': [IsAuthenticated, IsMemberCourse],
+        'retrieve': [IsAuthenticated, IsMemberCourse],
         'create': [IsAuthenticated, IsTeacher],
         'update': [IsAuthenticated, IsTeacher, IsTeacherAuthor],
         'partial_update': [IsAuthenticated, IsTeacher, IsTeacherAuthor],
@@ -39,8 +39,8 @@ class LectureViewSet(viewsets.ModelViewSet):
     """
     queryset = Lecture.objects.all()
     permission_classes_by_action = {
-        'list': [IsAuthenticated, ],
-        'retrieve': [IsAuthenticated, ],
+        'list': [IsAuthenticated, IsMemberLecture],
+        'retrieve': [IsAuthenticated, IsMemberLecture],
         'create': [IsAuthenticated, IsTeacher],
         'update': [IsAuthenticated, IsTeacher, IsTeacherAuthor],
         'partial_update': [IsAuthenticated, IsTeacher, IsTeacherAuthor],
@@ -66,8 +66,8 @@ class TaskViewSet(viewsets.ModelViewSet):
     """
     queryset = Task.objects.all()
     permission_classes_by_action = {
-        'list': [IsAuthenticated, ],
-        'retrieve': [IsAuthenticated, ],
+        'list': [IsAuthenticated, IsMemberTask],
+        'retrieve': [IsAuthenticated, IsMemberTask],
         'create': [IsAuthenticated, IsTeacher],
         'update': [IsAuthenticated, IsTeacher],
         'partial_update': [IsAuthenticated, IsTeacher],
@@ -94,8 +94,8 @@ class HomeworkViewSet(viewsets.ModelViewSet):
     """
     queryset = Homework.objects.all()
     permission_classes_by_action = {
-        'list': [IsAuthenticated, ],
-        'retrieve': [IsAuthenticated, ],
+        'list': [IsAuthenticated, IsMemberHomework],
+        'retrieve': [IsAuthenticated, IsMemberHomework],
         'create': [IsAuthenticated, IsStudent],
         'update': [IsAuthenticated, IsStudent, IsStudentAuthor],
         'partial_update': [IsAuthenticated, IsStudent, IsStudentAuthor],
