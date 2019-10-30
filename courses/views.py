@@ -1,7 +1,8 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 
-from authentication.permissions import IsTeacher, IsTeacherAuthor, IsStudent, IsUserAuthor, IsStudentAuthor
+from authentication.permissions import IsTeacher, IsTeacherAuthor, IsStudent, IsUserAuthor, IsStudentAuthor, \
+    IsMemberCourse, IsMemberLecture, IsMemberTask, IsMemberHomework
 from .models import Course, Homework, Lecture, Task, Mark, Comment
 from .serializers import CourseSerializer, CourseReadSerializer, TaskSerializer, TaskReadSerializer, \
     LectureSerializer, LectureReadSerializer, HomeworkReadSerializer, HomeworkSerializer, MarkReadSerializer, \
