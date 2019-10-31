@@ -4,137 +4,104 @@ from .models import Course, Task, Homework, Mark, Comment, Lecture
 
 
 class CourseSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Course
-        fields = ('title', 'students', 'teachers')
-
-    def create(self, validated_data):
-        request = self.context['request']
-        author = request.user
-        students_data = validated_data.pop('students')
-        teachers_data = validated_data.pop('teachers')
-        course = Course.objects.create(author=author, **validated_data)
-
-
-############################################### peredelat
-        for student in students_data:
-            course.students.add(student)
-        for teacher in teachers_data:
-            course.teachers.add(teacher)
-        return course
-
-
-class CourseReadSerializer(CourseSerializer):
+    author = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Course
         fields = '__all__'
-        # depth = 1
 
 
 class LectureSerializer(serializers.ModelSerializer):
+    author = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Lecture
-        fields = ('theme', 'file',)
+        fields = ('author', 'theme', 'file',)
 
     def create(self, validated_data):
-        request = self.context['request']
-        author = request.user
         course_id = self.context.get('request').parser_context['kwargs']['course_id']
         validated_data['course'] = Course.objects.get(pk=course_id)
-        return Lecture.objects.create(author=author, **validated_data)
+        return Lecture.objects.create(**validated_data)
 
 
 class LectureReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lecture
         fields = ('id', 'author', 'course', 'theme', 'file',)
-        # depth = 2
 
 
 class TaskSerializer(serializers.ModelSerializer):
+    author = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Task
-        fields = ('name', 'task',)
+        fields = ('author', 'name', 'task',)
 
     def create(self, validated_data):
-        request = self.context['request']
-        author = request.user
         lecture_id = self.context.get('request').parser_context['kwargs']['lecture_id']
         validated_data['lecture'] = Lecture.objects.get(pk=lecture_id)
-        return Task.objects.create(author=author, **validated_data)
+        return Task.objects.create(**validated_data)
 
 
 class TaskReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = ('id', 'author', 'lecture', 'name', 'task',)
-        # depth = 1
 
 
 class HomeworkSerializer(serializers.ModelSerializer):
+    author = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Homework
-        fields = ('file',)
+        fields = ('author', 'file',)
 
     def create(self, validated_data):
-        request = self.context['request']
-        author = request.user
         task_id = self.context.get('request').parser_context['kwargs']['task_id']
         validated_data['task'] = Task.objects.get(pk=task_id)
-        return Homework.objects.create(author=author, **validated_data)
+        return Homework.objects.create(**validated_data)
 
 
 class HomeworkReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Homework
         fields = ('id', 'author', 'task', 'file',)
-        # depth = 1
 
 
 class MarkSerializer(serializers.ModelSerializer):
-
+    author = serializers.HiddenField(default=serializers.CurrentUserDefault())
     mark = serializers.IntegerField(min_value=0, max_value=10)
 
     class Meta:
         model = Mark
-        fields = ('mark',)
+        fields = ('author', 'mark',)
 
     def create(self, validated_data):
-        request = self.context['request']
-        author = request.user
         homework_id = self.context.get('request').parser_context['kwargs']['homework_id']
         validated_data['homework'] = Homework.objects.get(pk=homework_id)
-        return Mark.objects.create(author=author, **validated_data)
+        return Mark.objects.create(**validated_data)
 
 
 class MarkReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Mark
         fields = ('id', 'author', 'homework', 'mark',)
-        # depth = 1
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Comment
-        fields = ('comment',)
+        fields = ('author', 'comment',)
 
     def create(self, validated_data):
-        request = self.context['request']
-        author = request.user
         mark_id = self.context.get('request').parser_context['kwargs']['mark_id']
         validated_data['mark'] = Mark.objects.get(pk=mark_id)
-        return Comment.objects.create(author=author, **validated_data)
+        return Comment.objects.create(**validated_data)
 
 
 class CommentReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ('id', 'author', 'mark', 'comment',)
-        # depth = 1
