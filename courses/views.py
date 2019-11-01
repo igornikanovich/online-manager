@@ -95,8 +95,8 @@ class TaskViewSet(viewsets.ModelViewSet):
     search_fields = ['name', ]
     ordering_fields = ['name', ]
     permission_classes_by_action = {
-        'list': [IsAuthenticated, ],
-        'retrieve': [IsAuthenticated, ],
+        'list': [IsAuthenticated, IsMember],
+        'retrieve': [IsAuthenticated, IsMember],
         'create': [IsAuthenticated, IsTeacher, IsMember],
         'update': [IsAuthenticated, IsTeacher, IsMember],
         'partial_update': [IsAuthenticated, IsTeacher, IsMember],
@@ -131,8 +131,8 @@ class HomeworkViewSet(viewsets.ModelViewSet):
     """
     queryset = Homework.objects.all()
     permission_classes_by_action = {
-        'list': [IsAuthenticated, ],
-        'retrieve': [IsAuthenticated, ],
+        'list': [IsAuthenticated, IsMember],
+        'retrieve': [IsAuthenticated, IsMember],
         'create': [IsAuthenticated, IsStudent, IsMember],
         'update': [IsAuthenticated, IsStudent, IsAuthor],
         'partial_update': [IsAuthenticated, IsStudent, IsAuthor],
@@ -178,8 +178,8 @@ class MarkViewSet(viewsets.ModelViewSet):
     """
     queryset = Mark.objects.all()
     permission_classes_by_action = {
-        'list': [IsAuthenticated, ],
-        'retrieve': [IsAuthenticated, ],
+        'list': [IsAuthenticated, IsMember],
+        'retrieve': [IsAuthenticated, IsMember],
         'create': [IsAuthenticated, IsTeacher, IsMember],
         'update': [IsAuthenticated, IsTeacher, IsMember],
         'partial_update': [IsAuthenticated, IsTeacher, IsMember],
@@ -228,8 +228,8 @@ class CommentViewSet(viewsets.ModelViewSet):
     search_fields = ['comment', 'author']
     ordering = ['-data']
     permission_classes_by_action = {
-        'list': [IsAuthenticated, ],
-        'retrieve': [IsAuthenticated, ],
+        'list': [IsAuthenticated, IsMember],
+        'retrieve': [IsAuthenticated, IsMember],
         'create': [IsAuthenticated, IsMember],
         'update': [IsAuthenticated, IsAuthor, IsMember],
         'partial_update': [IsAuthenticated, IsAuthor, IsMember],

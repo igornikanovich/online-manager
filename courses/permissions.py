@@ -1,6 +1,6 @@
 from rest_framework import permissions
 
-from courses.models import Course, Homework
+from courses.models import Course, Homework, Mark
 
 
 class IsTeacher(permissions.BasePermission):
