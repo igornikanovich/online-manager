@@ -8,8 +8,8 @@ from courses.utils import content_file_name, content_file_answer
 class Course(models.Model):
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='author_course')
     title = models.CharField(max_length=64, unique=True)
-    teachers = models.ManyToManyField(User, related_name='teachers', blank=True)
-    students = models.ManyToManyField(User, related_name='students', blank=True)
+    teachers = models.ManyToManyField(User, related_name='teachers', blank=True, limit_choices_to={'user_type': '1'})
+    students = models.ManyToManyField(User, related_name='students', blank=True, limit_choices_to={'user_type': '2'})
 
     def __str__(self):
         return self.title
@@ -58,6 +58,7 @@ class Comment(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     mark = models.ForeignKey(Mark, on_delete=models.CASCADE)
     comment = models.TextField(max_length=1024)
+    data = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.comment

@@ -1,9 +1,11 @@
 from django.db import IntegrityError
+from django.db.models import Q
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.filters import SearchFilter, OrderingFilter
 
-from authentication.permissions import IsTeacher, IsStudent, IsAuthor
+from .permissions import IsTeacher, IsStudent, IsAuthor, IsMember
 from .models import Course, Homework, Lecture, Task, Mark, Comment
 from .serializers import CourseSerializer, CourseReadSerializer, TaskSerializer, TaskReadSerializer, \
     LectureSerializer, LectureReadSerializer, HomeworkReadSerializer, HomeworkSerializer, MarkReadSerializer, \
@@ -15,13 +17,16 @@ class CourseViewSet(viewsets.ModelViewSet):
     Endpoint for list, create, update and delete a course.
     """
     queryset = Course.objects.all()
+    filter_backends = [SearchFilter, OrderingFilter]
+    search_fields = ['title', 'author__username']
+    ordering_fields = ['title', 'author', ]
     permission_classes_by_action = {
         'list': [IsAuthenticated, ],
         'retrieve': [IsAuthenticated, ],
         'create': [IsAuthenticated, IsTeacher],
-        'update': [IsAuthenticated, IsTeacher],
-        'partial_update': [IsAuthenticated, IsTeacher],
-        'destroy': [IsAuthenticated, IsTeacher],
+        'update': [IsAuthenticated, IsTeacher, IsMember],
+        'partial_update': [IsAuthenticated, IsTeacher, IsMember],
+        'destroy': [IsAuthenticated, IsTeacher, IsMember],
     }
 
     def get_permissions(self):
@@ -38,7 +43,7 @@ class CourseViewSet(viewsets.ModelViewSet):
         if user.is_superuser:
             return Course.objects.all()
         if user.user_type == 1:
-            return Course.objects.filter(teachers=user)
+            return Course.objects.filter(Q(teachers=user) | Q(author=user))
         else:
             return Course.objects.filter(students=user)
 
@@ -48,13 +53,16 @@ class LectureViewSet(viewsets.ModelViewSet):
     Endpoint for list, create, update and delete a lecture.
     """
     queryset = Lecture.objects.all()
+    filter_backends = [SearchFilter, OrderingFilter]
+    search_fields = ['theme', 'course__title']
+    ordering_fields = ['theme', 'author', ]
     permission_classes_by_action = {
         'list': [IsAuthenticated, ],
         'retrieve': [IsAuthenticated, ],
-        'create': [IsAuthenticated, IsTeacher],
-        'update': [IsAuthenticated, IsTeacher],
-        'partial_update': [IsAuthenticated, IsTeacher],
-        'destroy': [IsAuthenticated, IsTeacher],
+        'create': [IsAuthenticated, IsTeacher, IsMember],
+        'update': [IsAuthenticated, IsTeacher, IsMember],
+        'partial_update': [IsAuthenticated, IsTeacher, IsMember],
+        'destroy': [IsAuthenticated, IsTeacher, IsMember],
     }
 
     def get_permissions(self):
@@ -72,7 +80,7 @@ class LectureViewSet(viewsets.ModelViewSet):
         if user.is_superuser:
             return Lecture.objects.all()
         if user.user_type == 1:
-            return Lecture.objects.filter(course__teachers=user,
+            return Lecture.objects.filter((Q(course__teachers=user) | Q(course__author=user)),
                                           course=course_id)
         else:
             return Lecture.objects.filter(course__students=user,
@@ -84,13 +92,16 @@ class TaskViewSet(viewsets.ModelViewSet):
     Endpoint for list, create, update and delete a task.
     """
     queryset = Task.objects.all()
+    filter_backends = [SearchFilter, OrderingFilter]
+    search_fields = ['name', ]
+    ordering_fields = ['name', ]
     permission_classes_by_action = {
         'list': [IsAuthenticated, ],
         'retrieve': [IsAuthenticated, ],
-        'create': [IsAuthenticated, IsTeacher, ],
-        'update': [IsAuthenticated, IsTeacher, ],
-        'partial_update': [IsAuthenticated, IsTeacher, ],
-        'destroy': [IsAuthenticated, IsTeacher, ],
+        'create': [IsAuthenticated, IsTeacher, IsMember],
+        'update': [IsAuthenticated, IsTeacher, IsMember],
+        'partial_update': [IsAuthenticated, IsTeacher, IsMember],
+        'destroy': [IsAuthenticated, IsTeacher, IsMember],
     }
 
     def get_permissions(self):
@@ -126,7 +137,7 @@ class HomeworkViewSet(viewsets.ModelViewSet):
         'create': [IsAuthenticated, IsStudent],
         'update': [IsAuthenticated, IsStudent, IsAuthor],
         'partial_update': [IsAuthenticated, IsStudent, IsAuthor],
-        'destroy': [IsAuthenticated, IsTeacher],
+        'destroy': [IsAuthenticated, IsTeacher, IsMember],
     }
 
     def get_permissions(self):
@@ -158,8 +169,8 @@ class HomeworkViewSet(viewsets.ModelViewSet):
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         except IntegrityError:
-            return Response(status=status.HTTP_403_FORBIDDEN) ################################### DOBAVIT OPISANIE
-
+            return Response({'details': 'You have sent an answer to your task. You can modify existing homework.'},
+                            status=status.HTTP_403_FORBIDDEN)
 
 
 class MarkViewSet(viewsets.ModelViewSet):
@@ -170,10 +181,10 @@ class MarkViewSet(viewsets.ModelViewSet):
     permission_classes_by_action = {
         'list': [IsAuthenticated, ],
         'retrieve': [IsAuthenticated, ],
-        'create': [IsAuthenticated, IsTeacher],
-        'update': [IsAuthenticated, IsTeacher],
-        'partial_update': [IsAuthenticated, IsTeacher],
-        'destroy': [IsAuthenticated, IsTeacher],
+        'create': [IsAuthenticated, IsTeacher, IsMember],
+        'update': [IsAuthenticated, IsTeacher, IsMember],
+        'partial_update': [IsAuthenticated, IsTeacher, IsMember],
+        'destroy': [IsAuthenticated, IsTeacher, IsMember],
     }
 
     def get_permissions(self):
@@ -197,19 +208,33 @@ class MarkViewSet(viewsets.ModelViewSet):
             return Mark.objects.filter(homework__author=user,
                                        homework_id=homework_id)
 
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        except IntegrityError:
+            return Response({'details': 'Homework is already appreciated. You can change an existing rating.'},
+                            status=status.HTTP_403_FORBIDDEN)
+
 
 class CommentViewSet(viewsets.ModelViewSet):
     """
     Endpoint for list, create, update and delete a comment.
     """
     queryset = Comment.objects.all()
+    filter_backends = [SearchFilter, OrderingFilter]
+    search_fields = ['comment', 'author']
+    ordering = ['-data']
     permission_classes_by_action = {
         'list': [IsAuthenticated, ],
         'retrieve': [IsAuthenticated, ],
-        'create': [IsAuthenticated, ],
-        'update': [IsAuthenticated, IsAuthor],
-        'partial_update': [IsAuthenticated, IsAuthor],
-        'destroy': [IsAuthenticated, IsAuthor],
+        'create': [IsAuthenticated, IsMember],
+        'update': [IsAuthenticated, IsAuthor, IsMember],
+        'partial_update': [IsAuthenticated, IsAuthor, IsMember],
+        'destroy': [IsAuthenticated, IsAuthor, IsMember],
     }
 
     def get_permissions(self):
