@@ -11,35 +11,15 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         queryset=User.objects.all(),
         message='User with this username/email already exists.'
     )
-
-    username = serializers.CharField(
-        min_length=3,
-        max_length=30,
-        validators=[USER_UNIQUE_VALIDATOR]
-    )
+    username = serializers.CharField(validators=[USER_UNIQUE_VALIDATOR])
     email = serializers.EmailField(max_length=100, validators=[USER_UNIQUE_VALIDATOR])
-    password = serializers.CharField(
-        write_only=True,
-        required=True,
-        min_length=8,
-        max_length=64,
-        style={'input_type': 'password'}
-    )
+    password = serializers.CharField(write_only=True, required=True, min_length=8,
+                                     style={'input_type': 'password'})
 
     class Meta:
         model = User
-        fields = (
-            'id',
-            'username',
-            'password',
-            'email',
-            'first_name',
-            'last_name',
-            'user_type',
-        )
-        extra_kwargs = {
-            'password': {'write_only': True},
-        }
+        fields = ('id', 'username', 'password', 'email', 'first_name', 'last_name', 'user_type',)
+        extra_kwargs = {'password': {'write_only': True},}
 
     def create(self, validated_data):
         password = validated_data.pop('password')
@@ -51,11 +31,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
 class UserLoginSerializer(serializers.Serializer):
     username = serializers.CharField()
-    password = serializers.CharField(
-        write_only=True,
-        required=True,
-        style={'input_type': 'password'}
-    )
+    password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
 
     def validate(self, data):
         username = data.get('username')
