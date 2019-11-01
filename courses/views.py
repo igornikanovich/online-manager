@@ -43,7 +43,7 @@ class CourseViewSet(viewsets.ModelViewSet):
         if user.is_superuser:
             return Course.objects.all()
         if user.user_type == 1:
-            return Course.objects.filter(Q(teachers=user) | Q(author=user))
+            return Course.objects.filter(teachers=user)
         else:
             return Course.objects.filter(students=user)
 
@@ -80,7 +80,7 @@ class LectureViewSet(viewsets.ModelViewSet):
         if user.is_superuser:
             return Lecture.objects.all()
         if user.user_type == 1:
-            return Lecture.objects.filter((Q(course__teachers=user) | Q(course__author=user)),
+            return Lecture.objects.filter(course__teachers=user,
                                           course=course_id)
         else:
             return Lecture.objects.filter(course__students=user,
@@ -134,7 +134,7 @@ class HomeworkViewSet(viewsets.ModelViewSet):
     permission_classes_by_action = {
         'list': [IsAuthenticated, ],
         'retrieve': [IsAuthenticated, ],
-        'create': [IsAuthenticated, IsStudent],
+        'create': [IsAuthenticated, IsStudent, IsMember],
         'update': [IsAuthenticated, IsStudent, IsAuthor],
         'partial_update': [IsAuthenticated, IsStudent, IsAuthor],
         'destroy': [IsAuthenticated, IsTeacher, IsMember],
@@ -255,5 +255,5 @@ class CommentViewSet(viewsets.ModelViewSet):
             return Comment.objects.filter(mark__homework__task__lecture__course__teachers=user,
                                           mark_id=mark_id)
         else:
-            return Comment.objects.filter(mark__homework__task__lecture__course__students=user,
+            return Comment.objects.filter(mark__homework__author=user,
                                           mark_id=mark_id)
